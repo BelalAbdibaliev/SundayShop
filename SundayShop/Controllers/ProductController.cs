@@ -8,7 +8,7 @@ using SundayShop.Mappers;
 
 namespace SundayShop.Controllers;
 
-[Route("sundayshop/product")]
+[Route("product")]
 [ApiController]
 public class ProductController : ControllerBase
 {
@@ -20,6 +20,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
+    [Route("getall")]
     public async Task<IActionResult> GetAll()
     {
          var products = await _productRepo.GetAllAsync();
@@ -27,15 +28,15 @@ public class ProductController : ControllerBase
          return Ok(products.Select(x => x.ToProductDto()));
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById([FromRoute] int id)
+    [HttpGet("getbyid")]
+    public async Task<IActionResult> GetById([FromQuery] int id)
     {
         var productModel = await _productRepo.GetByIdAsync(id);
 
         return productModel != null ? Ok(productModel.ToProductDto()) : BadRequest();
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateProductRequestDto productDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -48,9 +49,8 @@ public class ProductController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = productModel.Id }, productModel.ToProductDto());
     }
 
-    [HttpDelete]
-    [Route("{id:int}")]
-    public async Task<IActionResult> Delete([FromRoute] int id)
+    [HttpDelete("delete")]
+    public async Task<IActionResult> Delete([FromQuery] int id)
     {
         var productModel = await _productRepo.DeleteAsync(id);
 
@@ -58,9 +58,8 @@ public class ProductController : ControllerBase
 
     }
 
-    [HttpPatch]
-    [Route("{id:int}")]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateProductDto productDto)
+    [HttpPatch("update")]
+    public async Task<IActionResult> Update([FromQuery] int id, [FromBody] UpdateProductDto productDto)
     {
         var productModel = await _productRepo.UpdateAsync(id, productDto);
 
